@@ -14,54 +14,11 @@
         <div class="img-cropper">
           <vue-cropper
             ref="cropper"
-            :aspect-ratio="16 / 9"
             :src="imgSrc"
             preview=".preview"
           />
         </div>
         <div class="actions">
-          <a
-            href="#"
-            role="button"
-            @click.prevent="zoom(0.2)"
-          >
-            Zoom In
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="zoom(-0.2)"
-          >
-            Zoom Out
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="move(-10, 0)"
-          >
-            Move Left
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="move(10, 0)"
-          >
-            Move Right
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="move(0, -10)"
-          >
-            Move Up
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="move(0, 10)"
-          >
-            Move Down
-          </a>
           <a
             href="#"
             role="button"
@@ -109,41 +66,12 @@
           <a
             href="#"
             role="button"
-            @click.prevent="getData"
-          >
-            Get Data
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="setData"
-          >
-            Set Data
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="getCropBoxData"
-          >
-            Get CropBox Data
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="setCropBoxData"
-          >
-            Set CropBox Data
-          </a>
-          <a
-            href="#"
-            role="button"
             @click.prevent="showFileChooser"
           >
             Upload Image
           </a>
         </div>
 
-        <textarea v-model="data" />
       </section>
       <section class="preview-area">
         <p>Preview</p>
@@ -173,7 +101,6 @@ export default {
     return {
       imgSrc: '/assets/images/berserk.jpg',
       cropImg: '',
-      data: null,
     };
   },
   methods: {
@@ -195,28 +122,11 @@ export default {
       this.$refs.cropper.scaleY(scale);
       dom.setAttribute('data-scale', scale);
     },
-    getCropBoxData() {
-      this.data = JSON.stringify(this.$refs.cropper.getCropBoxData(), null, 4);
-    },
-    getData() {
-      this.data = JSON.stringify(this.$refs.cropper.getData(), null, 4);
-    },
-    move(offsetX, offsetY) {
-      this.$refs.cropper.move(offsetX, offsetY);
-    },
     reset() {
       this.$refs.cropper.reset();
     },
     rotate(deg) {
       this.$refs.cropper.rotate(deg);
-    },
-    setCropBoxData() {
-      if (!this.data) return;
-      this.$refs.cropper.setCropBoxData(JSON.parse(this.data));
-    },
-    setData() {
-      if (!this.data) return;
-      this.$refs.cropper.setData(JSON.parse(this.data));
     },
     setImage(e) {
       const file = e.target.files[0];
@@ -239,9 +149,6 @@ export default {
     showFileChooser() {
       this.$refs.input.click();
     },
-    zoom(percent) {
-      this.$refs.cropper.relativeZoom(percent);
-    },
   },
 };
 </script>
@@ -253,7 +160,9 @@ body {
   width: 1024px;
   margin: 0 auto;
 }
-
+input[type="file"] {
+  display: none;
+}
 .header {
   display: flex;
   justify-content: space-between;
