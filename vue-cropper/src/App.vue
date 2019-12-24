@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Header />
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
@@ -11,6 +11,11 @@ import Header from './views/Header.vue'
 export default {
   components: {
     Header
+  },
+  data() {
+    return {
+      data: []
+    }
   }
 }
 </script>

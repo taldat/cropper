@@ -20,10 +20,10 @@
       <el-col :span="5" class="action">
           <div class="item">
             <div class="label">
-              Xoay ảnh
+              Loại quần áo
             </div>
             <div class="btn">
-              <el-select v-model="type" placeholder="Chọn loại quần áo">
+              <el-select v-model="type" placeholder="Chọn loại quần áo" class="select-type">
                 <el-option
                   v-for="item in imgType"
                   :key="item.value"
@@ -96,28 +96,29 @@
           <vue-cropper
             ref="cropper"
             :src="imgSrc"
-            preview=".preview"
           />
         </div>
-        <div class="actions">
-          
-        </div>
-
       </el-col>
       </section>
-      <!-- <section class="preview-area">
-        <p>Preview</p>
-        <div class="preview" />
-        <p>Cropped Image</p>
-        <div class="cropped-image">
-          <img
-            v-if="cropImg"
-            :src="cropImg"
-            alt="Cropped Image"
-          />
-          <div v-else class="crop-placeholder" />
-        </div>
-      </section> -->
+      <el-dialog
+        class="dialog-img"
+        title="Ảnh đã cắt"
+        :visible.sync="dialog">
+        <span>
+          <div class="cropped-image">
+            <img
+              v-if="cropImg"
+              :src="cropImg"
+              alt="Cropped Image"
+            />
+            <div v-else class="crop-placeholder" />
+          </div>
+      </span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialog = false">Quay lại</el-button>
+          <el-button type="primary" @click="uploadImage">Đồng ý</el-button>
+        </span>
+      </el-dialog> 
     </div>
   </div>
 </template>
@@ -125,43 +126,50 @@
 <script>
 import VueCropper from 'vue-cropperjs';
 import 'cropperjs/dist/cropper.css';
-import Message from 'element-ui'
+import Message from 'element-ui';
+import axios from 'axios'
 export default {
   components: {
     VueCropper,
   },
   data() {
     return {
+      dialog: false,
       imgSrc: '',
+      img: '',
+      crop: '',
       cropImg: '',
       type: '',
       imgType: [
         {
           label: 'Áo',
-          value: 1
+          value: '1'
         },
         {
           label: 'Quần',
-          value: 2
+          value: '2'
         },
         {
           label: 'Váy',
-          value: 3
+          value: '3'
         },
         {
           label: 'Giày',
-          value: 4
+          value: '4'
         },
         {
           label: 'Đồng hồ',
-          value: 5
+          value: '5'
         },
       ]
     };
   },
+
   methods: {
     cropImage() {
-      this.cropImg = this.$refs.cropper.getCroppedCanvas().toDataURL();
+      this.dialog = true
+      this.crop = this.$refs.cropper.getCroppedCanvas()
+      this.cropImg = this.$refs.cropper.getCroppedCanvas().toDataURL()
     },
     flipX() {
       const dom = this.$refs.flipX;
@@ -186,22 +194,22 @@ export default {
     setImage(e) {
       const file = e.target.files[0];
       if (file.type.indexOf('image/') === -1) {
-        Message({
+        this.$message({
           type: 'error',
           message: 'Không đúng định dạng file'
         })
         return;
       }
+      this.img = file
+      console.log(this.img)
       if (typeof FileReader === 'function') {
         const reader = new FileReader();
         reader.onload = (event) => {
           this.imgSrc = event.target.result;
-          // rebuild cropperjs with the updated source
-          this.$refs.cropper.replace(event.target.result);
         };
         reader.readAsDataURL(file);
       } else {
-        Message({
+        this.$message({
           type: 'error',
           message: 'File không được hỗ trợ'
         })
@@ -211,12 +219,28 @@ export default {
     showFileChooser() {
       this.$refs.input.click();
     },
+    uploadImage() {
+      if (this.type == '') {
+        this.$message({
+          type: 'error',
+          message: 'Bạn chưa chọn loại quần áo'
+        })
+      } else {
+        this.crop.toBlob((blob) => {
+          let form = new FormData()
+          form.append('file', blob, this.img.name)
+          axios.post('http://192.168.43.192:3000/getdata?type=' + this.type, form)
+          .then(res => {
+            this.$store.dispatch('saveData', res.data)
+          }).catch(err => console.log(err))
+        })
+      }
+    }
   },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="css" scoped>
 .input-img {
   display: none;
 }
@@ -229,6 +253,7 @@ export default {
 .input-container {
   width: 100%;
   text-align: center;
+  padding-top: 10%;
 }
 
 .input-container i {
@@ -279,9 +304,13 @@ export default {
   text-decoration: unset;
 }
 
-.el-select .el-input .el-input__inner {
-  background-color: #409EFF;
-  color: white;
-  font-size: 16px;
+.cropper-area {
+  display: flex;
+  align-items: center;
+}
+
+.img-cropper {
+  width: 60%;
+  margin-left: 20%;
 }
 </style>
