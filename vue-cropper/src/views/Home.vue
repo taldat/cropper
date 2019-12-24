@@ -114,7 +114,7 @@
             />
             <div v-else class="crop-placeholder" />
           </div>
-      </span>
+        </span>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialog = false">Quay lại</el-button>
           <el-button type="primary" @click="uploadImage">Đồng ý</el-button>
@@ -203,13 +203,13 @@ export default {
         return;
       }
       this.img = file
-      console.log(this.img)
       if (typeof FileReader === 'function') {
         const reader = new FileReader();
         reader.onload = (event) => {
-          this.imgSrc = event.target.result;
+          this.imgSrc = event.target.result
+          this.$refs.cropper.replace(event.target.result)
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(file)
       } else {
         this.$message({
           type: 'error',
@@ -233,11 +233,17 @@ export default {
           let form = new FormData()
           form.append('file', blob, this.img.name)
           await axios.post('http://192.168.43.192:3000/getdata?type=' + this.type, form)
-          .then(res => {
-            this.$store.dispatch('saveData', res.data)
-          }).catch(err => console.log(err))
-          this.loading = false
-          this.$router.push({path: '/results'})
+          .then(async res => {
+            await this.$store.dispatch('saveData', res.data)
+            this.loading = false
+            this.$router.push({path: '/results'})
+          }).catch(err => {
+            this.loading = false
+            this.$message({
+              type: 'error',
+              message: 'Không tìm thấy kết quả'
+            })
+          })
         })
       }
     }

@@ -1,6 +1,6 @@
 <template>
   <div class="results">
-        <el-card >
+        <el-card class="card">
         <el-row>
             <el-col :span="1">
                 <el-button style="margin-left: 40px" type="primary" @click="$router.push({path: '/'})">
@@ -10,7 +10,7 @@
             </el-col>
         </el-row>
         <el-row>
-            <el-col :span="7" v-for="(item, index) in data" style="margin-left: 40px; margin-top: 30px">
+            <el-col :span="7" v-for="(item, index) in data" style="margin-left: 40px; margin-top: 30px" :key="index">
                 <el-card shadow="hover" class="card-image">
                 <img :src="'http://192.168.43.192:3000/' + item.path" class="image" @click="OpenDialog(item)">
                 <div style="padding: 14px;">
@@ -22,7 +22,7 @@
     </el-card>
     <el-dialog title="Chi tiết ảnh"  width="45%" :visible.sync="dialogInfo">
         <div v-loading="loadingDialog">
-            <img :src="this.image.img" style="width: 75%">
+            <img :src="'http://192.168.43.192:3000/' + this.image.path" style="width: 75%">
         </div>
     </el-dialog>
   </div>
