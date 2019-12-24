@@ -3,7 +3,7 @@
         <el-card >
         <el-row>
             <el-col :span="1">
-                <el-button style="margin-left: 40px" type="primary">
+                <el-button style="margin-left: 40px" type="primary" @click="$router.push({path: '/'})">
                     <i class="el-icon-back"></i>
                     Quay lại
                 </el-button>
@@ -12,7 +12,7 @@
         <el-row>
             <el-col :span="7" v-for="(item, index) in data" style="margin-left: 40px; margin-top: 30px">
                 <el-card shadow="hover" class="card-image">
-                <img :src="item.img" class="image" @click="OpenDialog(item)">
+                <img :src="'http://192.168.43.192:3000/' + item.path" class="image" @click="OpenDialog(item)">
                 <div style="padding: 14px;">
                     <a target="_blank" :href="item.url">Đường dẫn</a>
                 </div>

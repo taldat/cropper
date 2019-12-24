@@ -101,6 +101,7 @@
       </el-col>
       </section>
       <el-dialog
+        v-loading="loading"
         class="dialog-img"
         title="Ảnh đã cắt"
         :visible.sync="dialog">
@@ -140,6 +141,7 @@ export default {
       crop: '',
       cropImg: '',
       type: '',
+      loading: false,
       imgType: [
         {
           label: 'Áo',
@@ -226,13 +228,16 @@ export default {
           message: 'Bạn chưa chọn loại quần áo'
         })
       } else {
-        this.crop.toBlob((blob) => {
+        this.crop.toBlob(async (blob) => {
+          this.loading = true
           let form = new FormData()
           form.append('file', blob, this.img.name)
-          axios.post('http://192.168.43.192:3000/getdata?type=' + this.type, form)
+          await axios.post('http://192.168.43.192:3000/getdata?type=' + this.type, form)
           .then(res => {
             this.$store.dispatch('saveData', res.data)
           }).catch(err => console.log(err))
+          this.loading = false
+          this.$router.push({path: '/results'})
         })
       }
     }
