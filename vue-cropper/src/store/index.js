@@ -7,7 +7,7 @@ export default new Vuex.Store({
   state: {
     data: []
   },
-  getter:{
+  getters:{
     data: (state) => {
       return state.data
     }

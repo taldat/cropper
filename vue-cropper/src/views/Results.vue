@@ -31,13 +31,13 @@
 import VueCropper from 'vue-cropperjs';
 import 'cropperjs/dist/cropper.css';
 import axios from 'axios';
+import {mapGetters} from 'vuex'
 
 export default {  
   data() {
     return {
         dialogInfo: false,
         loadingDialog: true,
-        data: [],
         errors: [],
         image: {},
     };
