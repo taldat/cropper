@@ -1,8 +1,19 @@
 <template>
   <div id="app">
+    <Header />
     <router-view/>
   </div>
 </template>
+
+<script>
+import Header from './views/Header.vue'
+
+export default {
+  components: {
+    Header
+  }
+}
+</script>
 
 <style>
 #app {
@@ -11,6 +22,13 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  width: 100%;
+  margin: 0 auto;
+  background-color: #1e2024; 
 }
 
 #nav {

@@ -1,16 +1,97 @@
 <template>
-  <div>
-
+  <div class="home-container">
     <input
       ref="input"
       type="file"
       name="image"
       accept="image/*"
+      class="input-img"
       @change="setImage"
     />
+    <div class="input-container" v-if="imgSrc == ''">
+      <i class="el-icon-picture-outline"></i><br>
+      <el-button class="input-btn" type="primary" @click="showFileChooser">
+        Chọn ảnh
+      </el-button>
+    </div>
 
-    <div class="content">
+    <div class="content" v-else>
       <section class="cropper-area">
+      <el-col :span="5" class="action">
+          <div class="item">
+            <div class="label">
+              Xoay ảnh
+            </div>
+            <div class="btn">
+              <el-select v-model="type" placeholder="Chọn loại quần áo">
+                <el-option
+                  v-for="item in imgType"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="item">
+            <div class="label">
+              Xoay ảnh
+            </div>
+            <div class="btn">
+              <el-button @click.prevent="rotate(90)" type="primary">
+                Xoay phải
+                <i class="el-icon-refresh-right"></i>
+              </el-button>
+              <el-button @click.prevent="rotate(-90)" type="primary">
+                Xoay trái
+                <i class="el-icon-refresh-left"></i>
+              </el-button>
+            </div>
+          </div>
+          <div class="item">
+            <div class="label">
+              Lật ảnh
+            </div>
+            <div class="btn">
+              <el-button class="btn-a" @click.prevent="flipX" type="primary">
+                <a ref="flipX" href="#" role="button">
+                  Lật ngang
+                  <i class="el-icon-refresh"></i>
+                </a>
+              </el-button>
+              <el-button class="btn-a" @click.prevent="flipY" type="primary">
+                <a ref="flipY" href="#" role="button">
+                  Lật dọc
+                  <i class="el-icon-sort"></i>
+                </a>
+              </el-button>
+            </div>
+          </div>
+          <div class="item">
+            <div class="label">
+              Cắt ảnh
+            </div>
+            <div class="btn">
+              <el-button @click.prevent="reset" type="danger">
+                <i class="el-icon-close"></i>
+              </el-button>
+              <el-button @click.prevent="cropImage" type="success">
+                <i class="el-icon-check"></i>
+              </el-button>
+            </div>
+          </div>
+          <div class="item">
+            <div class="label">
+              Chọn ảnh khác
+            </div>
+            <div class="btn">
+              <el-button @click.prevent="showFileChooser" type="primary">
+                Chọn ảnh
+              </el-button>
+            </div>
+          </div>
+      </el-col>
+      <el-col :span="19" class="cropper-area">
         <div class="img-cropper">
           <vue-cropper
             ref="cropper"
@@ -19,61 +100,12 @@
           />
         </div>
         <div class="actions">
-          <a
-            href="#"
-            role="button"
-            @click.prevent="rotate(90)"
-          >
-            Rotate +90deg
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="rotate(-90)"
-          >
-            Rotate -90deg
-          </a>
-          <a
-            ref="flipX"
-            href="#"
-            role="button"
-            @click.prevent="flipX"
-          >
-            Flip X
-          </a>
-          <a
-            ref="flipY"
-            href="#"
-            role="button"
-            @click.prevent="flipY"
-          >
-            Flip Y
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="cropImage"
-          >
-            Crop
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="reset"
-          >
-            Reset
-          </a>
-          <a
-            href="#"
-            role="button"
-            @click.prevent="showFileChooser"
-          >
-            Upload Image
-          </a>
+          
         </div>
 
+      </el-col>
       </section>
-      <section class="preview-area">
+      <!-- <section class="preview-area">
         <p>Preview</p>
         <div class="preview" />
         <p>Cropped Image</p>
@@ -85,7 +117,7 @@
           />
           <div v-else class="crop-placeholder" />
         </div>
-      </section>
+      </section> -->
     </div>
   </div>
 </template>
@@ -93,19 +125,42 @@
 <script>
 import VueCropper from 'vue-cropperjs';
 import 'cropperjs/dist/cropper.css';
+import Message from 'element-ui'
 export default {
   components: {
     VueCropper,
   },
   data() {
     return {
-      imgSrc: '/assets/images/berserk.jpg',
+      imgSrc: '',
       cropImg: '',
+      type: '',
+      imgType: [
+        {
+          label: 'Áo',
+          value: 1
+        },
+        {
+          label: 'Quần',
+          value: 2
+        },
+        {
+          label: 'Váy',
+          value: 3
+        },
+        {
+          label: 'Giày',
+          value: 4
+        },
+        {
+          label: 'Đồng hồ',
+          value: 5
+        },
+      ]
     };
   },
   methods: {
     cropImage() {
-      // get image data for post processing, e.g. upload or setting image src
       this.cropImg = this.$refs.cropper.getCroppedCanvas().toDataURL();
     },
     flipX() {
@@ -131,7 +186,10 @@ export default {
     setImage(e) {
       const file = e.target.files[0];
       if (file.type.indexOf('image/') === -1) {
-        alert('Please select an image file');
+        Message({
+          type: 'error',
+          message: 'Không đúng định dạng file'
+        })
         return;
       }
       if (typeof FileReader === 'function') {
@@ -143,7 +201,11 @@ export default {
         };
         reader.readAsDataURL(file);
       } else {
-        alert('Sorry, FileReader API not supported');
+        Message({
+          type: 'error',
+          message: 'File không được hỗ trợ'
+        })
+        return;
       }
     },
     showFileChooser() {
@@ -154,74 +216,72 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  width: 1024px;
-  margin: 0 auto;
-}
-input[type="file"] {
+<style scoped>
+.input-img {
   display: none;
 }
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0 5px 0;
+
+.home-container {
+  min-height: calc(100vh - 56px);
+  width: 100%;
 }
-.header h2 {
-  margin: 0;
+
+.input-container {
+  width: 100%;
+  text-align: center;
 }
-.header a {
-  text-decoration: none;
-  color: black;
-}
-.content {
-  display: flex;
-  justify-content: space-between;
-}
-.cropper-area {
-  width: 614px;
-}
-.actions {
-  margin-top: 1rem;
-}
-.actions a {
-  display: inline-block;
-  padding: 5px 15px;
-  background: #0062CC;
+
+.input-container i {
   color: white;
-  text-decoration: none;
-  border-radius: 3px;
-  margin-right: 1rem;
-  margin-bottom: 1rem;
+  font-size: 120px;
+  margin-bottom: 20px;
 }
-textarea {
-  width: 100%;
-  height: 100px;
+
+.input-container .el-button {
+  color: white;
+  font-size: 30px;
 }
-.preview-area {
-  width: 307px;
+
+.action {
+  text-align: justify;
+  background-color: #373842;
+  color: white;
+  border: none;
+  min-height: calc(100vh - 56px);
 }
-.preview-area p {
-  font-size: 1.25rem;
-  margin: 0;
-  margin-bottom: 1rem;
+
+.item {
+  background-color: #25262d;
+  margin: 10px;
+  padding: 20px; 
+  border-radius: 12px;
 }
-.preview-area p:last-of-type {
-  margin-top: 1rem;
+
+.item .label {
+  color: white;
+  font-size: 20px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #3f414c;
 }
-.preview {
-  width: 100%;
-  height: calc(372px * (9 / 16));
-  overflow: hidden;
+
+.item .btn {
+  padding-top: 10px;
 }
-.crop-placeholder {
-  width: 100%;
-  height: 200px;
-  background: #ccc;
+
+.item .btn .el-button {
+  width: 45%;
+  padding: 10px 0;
+  font-size: 16px;
 }
-.cropped-image img {
-  max-width: 100%;
+
+.item .btn .el-button a {
+  color: white;
+  text-decoration: unset;
+}
+
+.el-select .el-input .el-input__inner {
+  background-color: #409EFF;
+  color: white;
+  font-size: 16px;
 }
 </style>
