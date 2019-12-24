@@ -1,23 +1,28 @@
 <template>
   <div class="results">
-      <el-card style="margin-top: 20px; margin-bottom: 20px" shadow="always">
+        <el-card >
         <el-row>
-            <el-col :span="7" v-for="(item, index) in data" style="margin-left: 30px; margin-top: 30px">
-                <el-card shadow="hover" v-loading="loadingImage">
-                <img :src="item.img" class="image">
+            <el-col :span="1">
+                <el-button style="margin-left: 40px" type="primary">
+                    <i class="el-icon-back"></i>
+                    Quay lại
+                </el-button>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="7" v-for="(item, index) in data" style="margin-left: 40px; margin-top: 30px">
+                <el-card shadow="hover" class="card-image">
+                <img :src="item.img" class="image" @click="OpenDialog(item)">
                 <div style="padding: 14px;">
-                    <h4>{{item.url}}</h4>
-                    <div class="bottom clearfix">
-                        <el-button type="text" class="button" @click="OpenDialog(item)">Chi tiết ảnh</el-button>
-                    </div>
+                    <a target="_blank" :href="item.url">Đường dẫn</a>
                 </div>
                 </el-card>
             </el-col>
         </el-row>
     </el-card>
-    <el-dialog title="Chi tiết ảnh"  width="60%" :visible.sync="dialogInfo">
+    <el-dialog title="Chi tiết ảnh"  width="45%" :visible.sync="dialogInfo">
         <div v-loading="loadingDialog">
-            <img :src="this.image.img" style="width: 100%">
+            <img :src="this.image.img" style="width: 75%">
         </div>
     </el-dialog>
   </div>
@@ -32,30 +37,20 @@ export default {
     return {
         dialogInfo: false,
         loadingDialog: true,
-        loadingImage: false,
         data: [],
         errors: [],
         image: {},
     };
   },
 
-  beforeMount(){
-      this.getData()
+  computed: {
+      ...mapGetters([
+          'data',
+      ])
   },
 
   methods: {
-    async getData(){
-        this.loadingImage = false
-        await axios.post('http://maimeo3.herokuapp.com/getdata')
-            .then(response => {
-                this.data = response.data
-                })
-            .catch(e => {
-            this.errors.push(e)
-            })
-
-            this.loadingImage = true
-    },
+    
     OpenDialog(item){
         this.loadingDialog = true
         this.image = item
@@ -67,30 +62,44 @@ export default {
 }
 </script>
 
-<style>  
-  .bottom {
-    margin-top: 13px;
-    line-height: 12px;
-  }
+<style scoped>  
+    .card {
+        margin-top: 20px; 
+        margin-bottom: 20px;
+        margin-left: 20px;
+        margin-right: 20px;
+        background-color: #373842;
+        border: 1px solid rgba(0,0,0,.8);
+    }
 
-  .button {
-    padding: 0;
-    float: right;
-  }
+    a:hover{
+        color: blue;
+        text-decoration: none;
+    }
 
-  .image {
-    width: 250px;
-    height: 250px;
-    display: block;
-  }
+    .bottom {
+        margin-top: 13px;
+        line-height: 12px;
+    }
 
-  .clearfix:before,
-  .clearfix:after {
-      display: table;
-      content: "";
-  }
-  
-  .clearfix:after {
-      clear: both
-  }
+    .button {
+        padding: 0;
+        float: right;
+    }
+
+    .image {
+        width: 100%;
+        height: 350px;
+        display: block;
+    }
+
+    .clearfix:before,
+    .clearfix:after {
+        display: table;
+        content: "";
+    }
+    
+    .clearfix:after {
+        clear: both
+    }
 </style>

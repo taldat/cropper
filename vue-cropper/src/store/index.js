@@ -7,6 +7,11 @@ export default new Vuex.Store({
   state: {
     data: []
   },
+  getter:{
+    data: (state) => {
+      return state.data
+    }
+  },
   mutations: {
     SET_DATA(state, newValue) {
       state.data = newValue

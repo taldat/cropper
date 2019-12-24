@@ -1,7 +1,7 @@
 <template>
     <div class="top-bar">
         <span>
-            Nhóm ???
+            Nhóm 7
         </span>
     </div>
 </template>
